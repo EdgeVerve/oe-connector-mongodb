@@ -23,7 +23,7 @@
   "dependencies": {
     "async": "^1.0.0",
     "debug": "^2.1.1",
-    "loopback-connector": "^2.2.0",
+    "loopback-connector": "2.7.1",
     "mongodb": "~2.0.35"
   },
   "devDependencies": {
