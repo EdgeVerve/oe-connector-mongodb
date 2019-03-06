@@ -63,7 +63,7 @@ describe('lazyConnect', function() {
 
   it('should connect on execute (lazyConnect = true)', function(done) {
     var ds = global.getDataSource({
-      host: '127.0.0.1',
+      host: global.config.host,
       port: global.config.port,
       lazyConnect: true,
     });
@@ -88,7 +88,7 @@ describe('lazyConnect', function() {
 
   it('should reconnect on execute when disconnected (lazyConnect = true)', function(done) {
     var ds = global.getDataSource({
-      host: '127.0.0.1',
+      host: global.config.host,
       port: global.config.port,
       lazyConnect: true,
     });
