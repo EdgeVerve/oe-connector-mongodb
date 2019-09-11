@@ -45,7 +45,7 @@ test:
   script:
     - echo 'Performing MongoDB Test'
     - export MONGODB_HOST="10.73.53.144"
-    - export MONGODB_PORT=27017
+    - export MONGODB_PORT=27018
     - export MONGODB_DATABASE=${CI_JOB_ID}_mongo
     - npm config set registry ${NPM_REGISTRY}
     - time npm install --no-optional
