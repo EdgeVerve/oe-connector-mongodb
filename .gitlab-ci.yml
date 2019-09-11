@@ -2,7 +2,8 @@ stages:
   - pre-build
   - pre-build-test
 
-image: $REGISTRY/evfoundation-executor-docker13:node8alpine36
+image: ${REGISTRY}/evfoundation-executor-docker13:node8alpine36
+
 variables:
   REGISTRY: registry.${DOMAIN_NAME}
 
@@ -19,7 +20,7 @@ npminstall:
     - status_eslint=0
     - exit_status=0
     - npm set progress=false
-    - npm config set registry https://registry.npmjs.org/
+    - npm config set registry ${NPM_REGISTRY}
     - time npm install eslint babel-eslint eslint-config-loopback --no-optional
     - if npm run lint; then status_eslint=0; else status_eslint=1; fi
     - if [ $status_eslint == 1 ]; then exit_status=1 && echo "esLint errors exist"; fi
@@ -27,36 +28,31 @@ npminstall:
     - echo "Code style check done successfully"
     - time npm install --no-optional
     - echo "Node Modules Installed"
-    - npm config rm registry
-    - npm audit --json >vulnerabilities.json
-    - status_vulnerabilities='echo $?'
-    - npm audit
-    - if [ $status_vulnerabilities == 1 ]; then exit_status=1 && echo "Dependency vulnerabilities exist"; fi
+    - mkdir -p ./artifacts/${CI_PROJECT_NAME}/
+    - npm audit --json > ./artifacts/${CI_PROJECT_NAME}/vulnerabilities.json || true
+    - if npm audit; then status_vulnerabilities=0; else status_vulnerabilities=1; fi
+    - if [ $status_vulnerabilities == 1 ]; then export exit_status=1; echo "Dependency vulnerabilities exist"; fi
     - if [ $exit_status == 1 ]; then exit $exit_status; fi
   artifacts:
-    untracked: true
     expire_in: 2h
     paths:
       - node_modules/
   tags:
     - CEP_RUNNER
 
-
 test:
   stage: pre-build-test
   script:
     - echo 'Performing MongoDB Test'
     - export MONGODB_HOST="10.73.53.144"
-    - export MONGODB_PORT=27018
-    - export MONGODB_DATABASE=${CI_PIPELINE_ID}_mongo
-    - npm config set registry https://registry.npmjs.org/
+    - export MONGODB_PORT=27017
+    - export MONGODB_DATABASE=${CI_JOB_ID}_mongo
+    - npm config set registry ${NPM_REGISTRY}
     - time npm install --no-optional
     - npm run test
   artifacts:
-    untracked: true
     expire_in: 2h
     paths:
       - coverage/
-    when: on_failure
   tags:
     - CEP_RUNNER
